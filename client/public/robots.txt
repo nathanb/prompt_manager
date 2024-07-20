@@ -1,0 +1,7 @@
+User-agent: *
+Disallow: /expired/
+
+User-agent: *
+Allow: /
+
+Sitemap: https://iws.io/sitemap.xml

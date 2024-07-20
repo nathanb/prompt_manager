@@ -1,15 +1,16 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
 /// <reference types="webpack/module" />
 /**
- * This webpack configuration is used specifically for a blog post found at: https://iws.io/2024/monorepo-part-iii#webpack-bare
- * It currently does not support CSS or other assets, but can be easily extended to do so. See blog post for more details.
+ * This webpack configuration is used specifically for a blog post found at: https://iws.io/2024/monorepo-part-iii#webpack-full
  */
 
+/* eslint-disable @typescript-eslint/no-var-requires */
+/* eslint-disable no-undef */
 const path = require('node:path');
 const webpack = require('webpack');
-// const HtmlWebpackPlugin = require('html-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const TerserPlugin = require('terser-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 function transformSharedToDefine(shared) {
   const result = {};
@@ -81,6 +82,14 @@ function buildConfig(argv) {
               projectReferences: true
             }
           }
+        },
+        {
+          test: /\.css$/i,
+          use: [
+            prodMode ? MiniCssExtractPlugin.loader : 'style-loader',
+            'css-loader',
+            'postcss-loader'
+          ]
         }
       ]
     },
@@ -94,16 +103,16 @@ function buildConfig(argv) {
     },
     plugins: [
       ...plugins,
-      // new HtmlWebpackPlugin({
-      //   template: path.join(__dirname, './src/index.html'),
-      //   templateParameters: sharedEnv,
-      //   hash: true
-      // }),
+      new MiniCssExtractPlugin(),
+      new HtmlWebpackPlugin({
+        template: path.join(__dirname, './src/index.html'),
+        templateParameters: sharedEnv,
+        hash: true
+      }),
       new webpack.DefinePlugin(transformSharedToDefine(sharedEnv))
     ],
     output: {
-      // filename: '[name]-[fullhash].bundle.js',
-      filename: '[name].js',
+      filename: '[name]-[fullhash].bundle.js',
       path: path.resolve(__dirname, 'dist'),
       clean: true,
       publicPath: sharedEnv.PUBLIC_URL

@@ -29,14 +29,6 @@ export const init = () => {
   // eslint-disable-next-line @stylistic/max-statements-per-line
   app.get('/alive', (req, res) => { res.status(200).send('ok'); }); // I use this for health checks. It happens before morgan logging.
 
-  // Set up Handlebars
-  app.engine('hbs', exphbs.engine({
-    defaultLayout: 'layout',
-    extname: '.hbs'
-  }));
-
-  app.set('view engine', 'hbs');
-
   if (process.env.NODE_ENV === 'production') {
     // NOTE production only middlewares
     app.use(morgan('combined'));

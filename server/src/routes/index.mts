@@ -1,12 +1,17 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Router } from 'express';
-import createHttpError from 'http-errors';
 
 const router = Router();
 
+const sendHtml = (_req: any, res: any) => {
+  res.send('../../../client/dist/index.html');
+};
+
 // Routes
-router.get('/', (req, res) => {
-  res.render('dashboard', {
+router.get('/', sendHtml);
+
+router.get('/dashboard', (req, res) => {
+  res.json({
     pageTitle: 'Dashboard',
     totalUsers: 1234,
     activeUsers: 987,
@@ -15,35 +20,35 @@ router.get('/', (req, res) => {
 });
 
 router.get('/query-monitor', (req, res) => {
-  res.render('query-monitor', {
+  res.json({
     pageTitle: 'Query Monitor',
     active: { queryMonitor: true }
   });
 });
 
 router.get('/host-metrics', (req, res) => {
-  res.render('other-pages', {
+  res.json({
     pageTitle: 'Host Metrics',
     active: { hostMetrics: true }
   });
 });
 
 router.get('/cluster-metrics', (req, res) => {
-  res.render('other-pages', {
+  res.json({
     pageTitle: 'Cluster Metrics',
     active: { clusterMetrics: true }
   });
 });
 
 router.get('/history', (req, res) => {
-  res.render('other-pages', {
+  res.json({
     pageTitle: 'History',
     active: { history: true }
   });
 });
 
 router.get('/admin', (req, res) => {
-  res.render('other-pages', {
+  res.json({
     pageTitle: 'Admin',
     active: { admin: true }
   });
@@ -76,10 +81,8 @@ router.get('/data', (req, res) => {
   res.json(jsonData);
 });
 
-// all unhandled routes (404)
-router.use((req, res, next) => {
-  next(createHttpError.NotFound('Not Found'));
-});
+// all unhandled routes; send html; let client side react; normally we could also handle 404s here by determining if this endpoint exists or not or checking the accept header of the request.
+router.use(sendHtml);
 
 // first error handler; renders error view.
 router.use((err: any, req: any, res: any, _next: any) => {
